@@ -162,6 +162,33 @@
             <button onclick="calculateActivity()">Calculate Remaining Time</button>
         </div>
 
+        <!-- Loved One Section (Dynamically loaded) -->
+        <div id="lovedOneSection" class="section" style="display:none;">
+            <div class="input-group">
+                <label for="lovedOneAge">Loved One's Age:</label>
+                <input type="number" id="lovedOneAge" placeholder="Enter their age">
+            </div>
+
+            <div class="input-group">
+                <label for="spentTime">Spent time with them? (in %)</label>
+                <input type="number" id="spentTime" placeholder="e.g., 90">
+            </div>
+
+            <div>
+                <h3>After separation</h3>
+            </div>
+
+            <div class="input-group">
+                <label for="visitsPerYear">I see them <input type="number" id="visitsPerYear" placeholder="e.g., 6"> times /year</label>
+            </div>
+
+            <div class="input-group">
+                <label for="visitDuration">Each visit lasts for  <input type="number" id="visitDuration" placeholder="e.g., 5"> days</label>
+            </div>
+
+            <button onclick="calculateTimeWithLovedOne()">Calculate Remaining Time with Loved One</button>
+        </div>
+
         <!-- Result Section -->
         <div class="result" id="result"></div>
     </div>
@@ -182,40 +209,15 @@
 
         // Hide all sections by default
         document.getElementById('activitySection').style.display = 'none';
+        document.getElementById('lovedOneSection').style.display = 'none';
 
         // Show the corresponding section based on the selection
         if (selectedOption === 'activity') {
             document.getElementById('activitySection').style.display = 'block';
+        } else {
+            document.getElementById('lovedOneSection').style.display = 'block';
         }
         document.getElementById('result').innerHTML = ''; // Clear result
-    }
-
-    // Helper function to get the activity-specific result message
-    function getActivityMessage(activity, remainingSessions, remainingYears) {
-        // Predefined keywords for activities
-        const activityKeywords = {
-            'book': 'books left to read',
-            'read': 'books left to read',
-            'watch': 'movies left to watch',
-            'movie': 'movies left to watch',
-            'exercise': 'workouts left to do',
-            'play': 'games left to play',
-            'trip': 'trips left to take',
-            'draw': 'drawings left to create',
-            'paint': 'paintings left to complete',
-            'write': 'articles/words left to write',
-        };
-
-        // Make the activity lowercase and check for matches
-        let activityLower = activity.toLowerCase();
-        for (let keyword in activityKeywords) {
-            if (activityLower.includes(keyword)) {
-                return `You have ${remainingSessions} ${activityKeywords[keyword]} (in about ${remainingYears} years left).`;
-            }
-        }
-
-        // Default fallback if no keyword matches
-        return `You have ${remainingSessions} remaining sessions for ${activity} (in about ${remainingYears} years left).`;
     }
 
     // Calculate Remaining Time for Activities
@@ -255,16 +257,68 @@
         // Calculate remaining sessions
         let remainingSessions = remainingYears * frequencyInYears;
 
-        // Get the activity-specific result message
-        let resultMessage = getActivityMessage(activity, remainingSessions, remainingYears);
-        
-        // Display the result
-        document.getElementById('result').innerHTML = resultMessage;
+        // Display the result based on activity type
+        let activityName = activity.charAt(0).toUpperCase() + activity.slice(1).toLowerCase();
+
+        document.getElementById('result').innerHTML = `You have ${remainingSessions} remaining sessions for ${activityName} (about ${remainingYears} years left).`;
     }
 
+    // Calculate Time Spent with Loved Ones
+    function calculateTimeWithLovedOne() {
+        // Get user inputs for loved one
+        let age = parseInt(document.getElementById('age').value);
+        let lovedOneAge = parseInt(document.getElementById('lovedOneAge').value);
+        let spentTimePercentage = parseInt(document.getElementById('spentTime').value);
+        let visitsPerYear = parseInt(document.getElementById('visitsPerYear').value);
+        let visitDuration = parseInt(document.getElementById('visitDuration').value);
+
+        // Constants
+        const maxAge = 90; // Assume a max age of 90 years
+
+        // Validate input
+        if (!age || !lovedOneAge || !spentTimePercentage || !visitsPerYear || !visitDuration) {
+            alert("Please enter valid values.");
+            return;
+        }
+
+        // Calculate past time spent with parents during the first X years
+        let yearsSpentTogether = age - 1; // Past time is calculated from age 0 to (current age - 1)
+        let pastTimeDays = Math.floor((yearsSpentTogether * 365) * (spentTimePercentage / 100));
+
+        // Current Pattern (assumes current age)
+        let currentPatternDays = visitsPerYear * visitDuration; // total days spent per year now
+
+        // Calculate future projection based on parent's remaining years
+        let remainingYears = maxAge - lovedOneAge;
+        let futureTimeDays = remainingYears * visitsPerYear * visitDuration;
+
+        // Total days across past, present, and future
+        let totalDaysSpent = pastTimeDays + (currentPatternDays * (maxAge - age)) + futureTimeDays;
+
+        // Breakdown percentages
+        let pastPercentage = (pastTimeDays / totalDaysSpent) * 100;
+        let currentPercentage = ((currentPatternDays * (maxAge - age)) / totalDaysSpent) * 100;
+        let futurePercentage = (futureTimeDays / totalDaysSpent) * 100;
+
+        // Display Results
+        let resultHtml = `
+            <div class="result-table">
+                <h3>Breakdown</h3>
+                <p>You spent <strong>${(pastTimeDays / 365).toFixed(2)}</strong> years with your parents during the first <strong>${age - 1}</strong> years.</p>
+                <u><strong>Future Projection:</strong></u>
+                <p>If your parents live for another <strong>${remainingYears}</strong> years, your remaining time with them would be:</p>
+                <ul>
+                    <li><strong>${(futureTimeDays / 365).toFixed(2)}</strong> years remaining</li>
+                </ul>
+                <u><strong>Total Breakdown:</strong></u>
+                <p>Past time: <strong>${pastPercentage.toFixed(2)}%</strong>, Current time: <strong>${currentPercentage.toFixed(2)}%</strong>, Future time: <strong>${futurePercentage.toFixed(2)}%</strong></p>
+            </div>
+        `;
+        document.getElementById('result').innerHTML = resultHtml;
+    }
 </script>
 <br>
-<u><h4>Don't be a procastinator</h4></u>
+<u><h4>Don't be a procrastinator</h4></u>
 <img src="procasticators_brain.png" alt="procasticators_brain" width="70%">
 </body>
 </html>
