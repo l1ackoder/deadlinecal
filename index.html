@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Tail End - Life's Activities</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            text-transform: uppercase;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .input-group input, .input-group select {
+            font-size: 16px;
+            padding: 10px;
+            width: 200px;
+        }
+
+        .result {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #030303;
+        }
+
+        .section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #ddd;
+        }
+
+        .section h3 {
+            margin-bottom: 20px;
+        }
+
+        .result-table {
+            text-align: left;
+            margin: 20px auto;
+            font-size: 18px;
+            line-height: 1.5;
+            border: 1px solid #ddd;
+            padding: 15px;
+            width: 80%;
+        }
+
+        .result-table p {
+            margin: 10px 0;
+        }
+
+        /* Floating "Inspired by Tim Urban" at the bottom right corner */
+        .floating-link {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .floating-link:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .floating-link a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Life's Tail End
+    </header>
+
+    <div class="container">
+        <h2>Calculate Your Remaining Time for Activity or Loved Ones</h2>
+
+        <!-- Select Option for either Activity or Loved One -->
+        <div class="input-group">
+            <label for="option">Choose what you want to calculate:</label>
+            <select id="option" onchange="toggleSections()">
+                <option value="activity" selected>Activity = Objective</option>
+                <option value="lovedOne">Loved Ones (e.g., Parents)</option>
+            </select>
+        </div>
+
+        <!-- Shared Inputs for Age -->
+        <div id="sharedInputs" class="section">
+            <div class="input-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" placeholder="Enter your current age.">
+            </div>
+        </div>
+
+        <!-- Activity Section (Dynamically loaded) -->
+        <div id="activitySection" class="section">
+            <div class="input-group">
+                <label for="activity">I <input type="text" id="activity" placeholder="Read Books/Watch Movies"> - <input type="number" id="frequency" placeholder="e.g. 10"> times</label>
+            </div>
+
+            <div class="input-group">
+                <label for="unit">Per:</label>
+                <select id="unit">
+                    <option value="days">Day(s)</option>
+                    <option value="months">Month(s)</option>
+                    <option value="years">Year(s)</option>
+                </select>
+            </div>
+
+            <button onclick="calculateActivity()">Calculate Remaining Time</button>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result" id="result"></div>
+    </div>
+
+    <!-- Floating Link for Tim Urban Inspiration -->
+    <div class="floating-link">
+        <a href="https://x.com/l1ackoder" target="_blank"> Made by l1ackoder :) </a>
+    </div>
+
+    <footer>
+        Inspired by : <a href="https://waitbutwhy.com/2015/12/the-tail-end.html" target="_blank">Tim Urban ❤️</a>
+    </footer>
+
+<script>
+    // Toggle between Activity and Loved One Tracker
+    function toggleSections() {
+        var selectedOption = document.getElementById('option').value;
+
+        // Hide all sections by default
+        document.getElementById('activitySection').style.display = 'none';
+
+        // Show the corresponding section based on the selection
+        if (selectedOption === 'activity') {
+            document.getElementById('activitySection').style.display = 'block';
+        }
+        document.getElementById('result').innerHTML = ''; // Clear result
+    }
+
+    // Helper function to get the activity-specific result message
+    function getActivityMessage(activity, remainingSessions, remainingYears) {
+        // Predefined keywords for activities
+        const activityKeywords = {
+            'book': 'books left to read',
+            'read': 'books left to read',
+            'watch': 'movies left to watch',
+            'movie': 'movies left to watch',
+            'exercise': 'workouts left to do',
+            'play': 'games left to play',
+            'trip': 'trips left to take',
+            'draw': 'drawings left to create',
+            'paint': 'paintings left to complete',
+            'write': 'articles/words left to write',
+        };
+
+        // Make the activity lowercase and check for matches
+        let activityLower = activity.toLowerCase();
+        for (let keyword in activityKeywords) {
+            if (activityLower.includes(keyword)) {
+                return `You have ${remainingSessions} ${activityKeywords[keyword]} (in about ${remainingYears} years left).`;
+            }
+        }
+
+        // Default fallback if no keyword matches
+        return `You have ${remainingSessions} remaining sessions for ${activity} (in about ${remainingYears} years left).`;
+    }
+
+    // Calculate Remaining Time for Activities
+    function calculateActivity() {
+        // Get user input for activity
+        let age = parseInt(document.getElementById('age').value);
+        let frequency = parseInt(document.getElementById('frequency').value);
+        let activity = document.getElementById('activity').value;
+        let unit = document.getElementById('unit').value;
+
+        // Constants
+        const maxAge = 90; // Assume a max age of 90 years
+
+        // Validate input
+        if (!age || !frequency || age < 0 || frequency <= 0 || !activity.trim()) {
+            alert("Please enter valid age, activity, and frequency.");
+            return;
+        }
+
+        // Convert the frequency to yearly terms
+        let frequencyInYears = frequency;
+
+        if (unit === "months") {
+            frequencyInYears = frequency * 12; // Convert months to a yearly count
+        } else if (unit === "days") {
+            frequencyInYears = frequency * 365; // Convert days to a yearly count
+        }
+
+        // Calculate remaining years
+        let remainingYears = maxAge - age;
+
+        if (remainingYears <= 0) {
+            document.getElementById('result').innerHTML = "You’ve reached or surpassed 90 years! Start enjoying every moment!";
+            return;
+        }
+
+        // Calculate remaining sessions
+        let remainingSessions = remainingYears * frequencyInYears;
+
+        // Get the activity-specific result message
+        let resultMessage = getActivityMessage(activity, remainingSessions, remainingYears);
+        
+        // Display the result
+        document.getElementById('result').innerHTML = resultMessage;
+    }
+
+</script>
+
+</body>
+</html>
