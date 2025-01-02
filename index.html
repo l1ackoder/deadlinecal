@@ -21,6 +21,69 @@
             padding: 20px;
             font-size: 24px;
             text-transform: uppercase;
+            position: relative;
+        }
+
+        /* Burger menu styles */
+        .menu-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            justify-content: space-between;
+        }
+
+        .menu-bar div {
+            height: 5px;
+            width: 100%;
+            background-color: white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 20px;
+            background-color: #4CAF50;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .menu a:hover {
+            background-color: #45a049;
+        }
+
+        .open .menu {
+            display: block;
+        }
+
+        .open .menu-bar div:nth-child(1) {
+            transform: rotate(45deg);
+            transform-origin: 5px 5px;
+        }
+
+        .open .menu-bar div:nth-child(2) {
+            opacity: 0;
+        }
+
+        .open .menu-bar div:nth-child(3) {
+            transform: rotate(-45deg);
+            transform-origin: 5px 15px;
         }
 
         .container {
@@ -122,6 +185,18 @@
 
     <header>
         Life's Tail End
+
+        <!-- Burger Menu -->
+        <div class="menu-bar" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <!-- Menu -->
+        <div class="menu">
+            <a href="/sol.html">How to Beat Procrastination</a>
+        </div>
     </header>
 
     <div class="container">
@@ -218,6 +293,11 @@
             document.getElementById('lovedOneSection').style.display = 'block';
         }
         document.getElementById('result').innerHTML = ''; // Clear result
+    }
+
+    // Toggle the burger menu
+    function toggleMenu() {
+        document.querySelector('header').classList.toggle('open');
     }
 
     // Calculate Remaining Time for Activities
@@ -317,6 +397,7 @@
         document.getElementById('result').innerHTML = resultHtml;
     }
 </script>
+
 <br>
 <u><h4>Don't be a procrastinator</h4></u>
 <img src="procasticators_brain.png" alt="procasticators_brain" width="70%">
