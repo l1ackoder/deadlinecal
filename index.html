@@ -156,7 +156,7 @@
             margin: 10px 0;
         }
 
-        /* Floating "Inspired by Tim Urban" at the bottom right corner */
+        /* Floating "Inspired by Tim Urban" */
         .floating-link {
             position: fixed;
             bottom: 20px;
@@ -179,6 +179,16 @@
             color: white;
             text-decoration: none;
         }
+
+        .input-group input, .input-group select {
+    font-size: 16px;
+    padding: 10px;
+    width: 200px;
+    border-radius: 15px; /* Makes the input boxes round */
+    background-color: #e0f7fa; /* Light blue background color */
+    border: 2px solid #007BFF; /* Blue border */
+}
+
     </style>
 </head>
 <body>
@@ -204,7 +214,7 @@
     <div class="container">
         <h2>Calculate Your Remaining Time for Activity or Loved Ones</h2>
 
-        <!-- Select Option for either Activity or Loved One -->
+        <!-- Select Option -->
         <div class="input-group">
             <label for="option">Choose what you want to calculate:</label>
             <select id="option" onchange="toggleSections()">
@@ -213,7 +223,7 @@
             </select>
         </div>
 
-        <!-- Shared Inputs for Age -->
+        <!--Inputs for Age -->
         <div id="sharedInputs" class="section">
             <div class="input-group">
                 <label for="age">Age:</label>
@@ -221,7 +231,7 @@
             </div>
         </div>
 
-        <!-- Activity Section (Dynamically loaded) -->
+        <!-- Activity Section -->
         <div id="activitySection" class="section">
             <div class="input-group">
                 <label for="activity">I <input type="text" id="activity" placeholder="Read Books/Watch Movies"> - <input type="number" id="frequency" placeholder="e.g. 10"> times</label>
@@ -230,16 +240,16 @@
             <div class="input-group">
                 <label for="unit">Per:</label>
                 <select id="unit">
-                    <option value="days">Day(s)</option>
-                    <option value="months">Month(s)</option>
-                    <option value="years">Year(s)</option>
+                    <option value="days">Day</option>
+                    <option value="months">Month</option>
+                    <option value="years">Year</option>
                 </select>
             </div>
 
             <button onclick="calculateActivity()">Calculate Remaining Time</button>
         </div>
 
-        <!-- Loved One Section (Dynamically loaded) -->
+        <!-- Loved One Section -->
         <div id="lovedOneSection" class="section" style="display:none;">
             <div class="input-group">
                 <label for="lovedOneAge">Loved One's Age:</label>
@@ -270,7 +280,7 @@
         <div class="result" id="result"></div>
     </div>
 
-    <!-- Floating Link for Tim Urban Inspiration -->
+    <!-- Tim Urban Inspiration -->
     <div class="floating-link">
         <a href="https://x.com/l1ackoder" target="_blank"> Made by l1ackoder :) </a>
     </div>
@@ -302,48 +312,127 @@
         document.querySelector('header').classList.toggle('open');
     }
 
-    // Calculate Remaining Time for Activities
-    function calculateActivity() {
-        // Get user input for activity
-        let age = parseInt(document.getElementById('age').value);
-        let frequency = parseInt(document.getElementById('frequency').value);
-        let activity = document.getElementById('activity').value;
-        let unit = document.getElementById('unit').value;
+// Calculate Remaining Time for Activities
+function calculateActivity() {
+    // Get user input for activity
+    let age = parseInt(document.getElementById('age').value);
+    let frequency = parseInt(document.getElementById('frequency').value);
+    let activity = document.getElementById('activity').value.toLowerCase(); // Convert activity to lowercase
+    let unit = document.getElementById('unit').value;
 
-        // Constants
-        const maxAge = 90; // Assume a max age of 90 years
+    // Constants
+    const maxAge = 90; // Assume a max age of 90 years
 
-        // Validate input
-        if (!age || !frequency || age < 0 || frequency <= 0 || !activity.trim()) {
-            alert("Please enter valid age, activity, and frequency.");
-            return;
-        }
-
-        // Convert the frequency to yearly terms
-        let frequencyInYears = frequency;
-
-        if (unit === "months") {
-            frequencyInYears = frequency * 12; // Convert months to a yearly count
-        } else if (unit === "days") {
-            frequencyInYears = frequency * 365; // Convert days to a yearly count
-        }
-
-        // Calculate remaining years
-        let remainingYears = maxAge - age;
-
-        if (remainingYears <= 0) {
-            document.getElementById('result').innerHTML = "You’ve reached or surpassed 90 years! Start enjoying every moment!";
-            return;
-        }
-
-        // Calculate remaining sessions
-        let remainingSessions = remainingYears * frequencyInYears;
-
-        // Display the result based on activity type
-        let activityName = activity.charAt(0).toUpperCase() + activity.slice(1).toLowerCase();
-
-        document.getElementById('result').innerHTML = `You have ${remainingSessions} remaining sessions for ${activityName} (in about ${remainingYears} years).`;
+    // Validate input
+    if (!age || !frequency || age < 0 || frequency <= 0 || !activity.trim()) {
+        alert("Please enter valid age, activity, and frequency.");
+        return;
     }
+
+    // Convert the frequency to yearly terms
+    let frequencyInYears = frequency;
+
+    if (unit === "months") {
+        frequencyInYears = frequency * 12; // Convert months to a yearly count
+    } else if (unit === "days") {
+        frequencyInYears = frequency * 365; // Convert days to a yearly count
+    }
+
+    // Calculate remaining years
+    let remainingYears = maxAge - age;
+
+    if (remainingYears <= 0) {
+        document.getElementById('result').innerHTML = "You’ve reached or surpassed 90 years! Start enjoying every moment!";
+        return;
+    }
+
+    // Calculate remaining sessions
+    let remainingSessions = remainingYears * frequencyInYears;
+
+    // Dynamically change the term based on the activity
+    let activityTerm = "sessions"; // Default term
+    let activityMessage = "to do"; // Default activity message
+    let motivationalMessage = ""; // Default motivational message
+    let unproductiveMessage = ""; // Default unproductive message
+
+    // Time calculations for unproductive activities
+    const averageMovieDuration = 3; // Average movie duration in hours
+    const hoursInDay = 24;
+    const daysInYear = 365;
+
+    // Check activity for specific terms and customize result based on activity
+    if (activity.includes("read") || activity.includes("book")) {
+        activityTerm = "books";
+        activityMessage = "to read";
+        motivationalMessage = "Choose your books wisely, for knowledge shapes your future.";
+    } else if (activity.includes("watch") || activity.includes("movie")) {
+        activityTerm = "movies";
+        activityMessage = "to watch";
+
+        // Calculate the time spent watching movies
+        let totalMovieTimeInHours = remainingSessions * averageMovieDuration; // Total time in hours
+        let totalMovieTimeInDays = totalMovieTimeInHours / hoursInDay; // Convert to days
+        let totalMovieTimeInMonths = totalMovieTimeInDays / 30; // Convert to months
+        let totalMovieTimeInYears = totalMovieTimeInDays / daysInYear; // Convert to years
+
+        // Unproductive message with reflection on time
+        unproductiveMessage = `
+            <br><br><i>
+            If you watch 1 movie every day (about 3 hours per movie), 
+            that will cost you approximately ${totalMovieTimeInDays.toFixed(2)} days, or ${totalMovieTimeInMonths.toFixed(2)} months of your life.
+            In ${remainingYears} years, this could take away about ${totalMovieTimeInYears.toFixed(2)} years from your life. 
+            Think again. Do you really want to spend your life this way?
+            </i>
+        `;
+    } else if (activity.includes("sleep")) {
+        activityTerm = "nights";
+        activityMessage = "left to sleep";
+    } else if (activity.includes("exercise") || activity.includes("workout")) {
+        activityTerm = "workouts";
+        activityMessage = "left to exercise";
+        motivationalMessage = "Exercise is not just about the body, but also the mind!";
+    } else if (activity.includes("travel")) {
+        activityTerm = "trips";
+        activityMessage = "left to travel";
+        motivationalMessage = "The world is a book, and those who do not travel read only one page.";
+    } else if (activity.includes("cook")) {
+        activityTerm = "meals";
+        activityMessage = "left to cook";
+    } else if (activity.includes("work") || activity.includes("job")) {
+        activityTerm = "workdays";
+        activityMessage = "left to work";
+        motivationalMessage = "Work hard, and make every day count!";
+    } else if (activity.includes("study") || activity.includes("learn")) {
+        activityTerm = "lessons";
+        activityMessage = "left to study";
+        motivationalMessage = "The more you learn, the more you grow.";
+    } else if (activity.includes("socialize") || activity.includes("friends")) {
+        activityTerm = "hangouts";
+        activityMessage = "left to socialize";
+    } else if (activity.includes("clean") || activity.includes("house")) {
+        activityTerm = "cleaning sessions";
+        activityMessage = "left to clean";
+    }
+
+    // Capitalize the first letter of the activity for a natural phrasing
+    let activityName = activity.charAt(0).toUpperCase() + activity.slice(1).toLowerCase();
+
+    // Display result message for activities
+    let resultMessage = `You have ${remainingSessions} remaining ${activityTerm} ${activityMessage} (in about ${remainingYears} years).`;
+
+    // Add motivational message if applicable
+    if (motivationalMessage) {
+        resultMessage += `<br><br><i>${motivationalMessage}</i>`;
+    }
+
+    // Add unproductive activity message for movies
+    resultMessage += unproductiveMessage;
+
+    document.getElementById('result').innerHTML = resultMessage;
+}
+
+
+
 
     // Calculate Time Spent with Loved Ones
     function calculateTimeWithLovedOne() {
